@@ -1,0 +1,6 @@
+#lang dssl2
+
+interface QUEUE[T]:
+    def enqueue(self) -> NoneC 
+    def dequeue(self) -> T 
+    def empty?(self) -> bool
