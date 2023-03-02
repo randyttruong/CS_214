@@ -1,0 +1,269 @@
+#+title: Notes
+#+description: Binary Search Trees
+
+#+begin_center
+Reminders:
+1. HW05 Redo Due Tonight
+2. Project Outline due on Tuesday
+3. Midterm 2 for March 9
+#+end_center
+
+* Dictionaries, revisited
+** Possibly the most broadly used ADT
+*** We used at least 3 in our example last week!
+** Hash Tables are a fien default, but not always the best
+*** O(1) operations, but only expected
+*** Still need good distribution of data across buckets
+*** Still O(n) for worst case
+*** Constantly wasting space on empty buckets
+** A new option for dictionaries: binary search trees
+*** BSTs = Binary trees + Invariants
+*** Can achieve O(log(n)) in the _worst case_
+*** No big jumps in space usage (versus hashing)
+
+* Binary Search who?
+** Stores elements in order in a linked data structure ( in this case, a binary tree )
+*** In order means we can do binary search
+**** Like with a sorted array
+*** Linked means we can easily insert new elements
+**** Like a linked list
+
+* BST Example
+** In order :from left to right, the keys are in increasing order
+*** Invariant: For each node n
+**** Every node in our let subtree has a key less than n's key
+**** Right subtree has nodes that are greater than
+** In the form of a linked list
+*** We store the tree as linked node structs
+**** We have a new key-=value pair -> new node
+
+* Understanding lookup
+** The process
+#+begin_src C
+Function get(root, key
+    Input: (A node root and a key);
+    Output: (A value, or nothing);
+
+
+
+#+end_src
+** Deletion
+*** 1. For leaves, we literally just replace the desired node with None
+   1. Obviously, we can't do this for parent nodes, since that would just
+      invalidate node that is rooted to it
+2. Therefore, we need to move the desired node to a leaf position THEN delete it
+   1. For internal nodes:
+      1. Find "next" node, which could either be the leftmost or rightmost node
+      2. Swap the nodes 
+      3. Delete the leaf
+   2. For internal nodes that only have a single child, we just swap the parent and
+      the child
+      1. It's not exactly "percolating down" per s
+*** 2. Insertion
+**** Issues
+** The solution?
+*** Self-balancing BSTs (AVL Tree)
+
+
+* Self Balancing Binary Search Trees
+** Observation
+*** Insertions (and deletions) are what may introduce unbalance ( i.e., not lookups nor updates )
+** Strategies
+*** Insert (or delete) as normal... THEN
+**** Use invariants to detect unbalance
+***** Broken invariant -> Tree is unbalanced
+**** Perform repairs to restore balance
+***** Shuffle nodes around, but preserve BST order
+*** Essentially, we fix the tree as we go along, and don't let things get out of hand
+**** Therefore, we only have ~small unbalances~ to fix each time
+** "Think GLobally, Act Locally"
+*** Balance is a ~global property~, meaning that it concerns the entire tree
+*** However, unbalance is a ~local issue~ that generally concerns some nodes
+*** Therefore, we can only repair unbalance with ~local changes~
+**** We should be inserting and deleting since they are ~local~ operations
+**** Any unbalance they'll introduce is ~local~ meaning that they are self-contained
+***** For example: If we insert into the left subtree, the right subtree is unchanged
+**** These balances are also ~bounded~, again, containing the unbalance and making it theoretically easier to solve
+* On AVL Trees
+** The first solution to the problem of self-balancing trees
+*** Imagine that everything after AVL trees is just a response to it
+** Each node stores a "balance factor," which is the difference between the height of its right subtree and its left subtree
+*** The balance factor ~must~ be between -1 and +1
+**** Anything higher means unbalance!
+*** Therefore, we must also implement ~repair~ methods
+**** Repairing is done by rotation, which is dependent on whether or not the unbalance is -2 or 2
+* Invariant: Balance Factors
+**
+* Repair: Tree Rotations
+** Example:
+*** Tree on the left is unbalanced, tree on the right is balanced
+*** We keep the same elements, and the BST invariant is respected for both
+*** Therefore, we just "rotate the tree to the right" from 11 (move it to the right) to go from left to right
+
+#+begin_src python
+def rotate_right(d):
+    let b = d.left
+    d.left = b.right
+    b.right = d
+    return b
+#+end_src
+
+#+begin_src python
+def rotate_left(b):
+    let d = b.right
+    b.right = d.left
+    d.left = b
+    return d
+#+end_src
+
+* Cases for Using Rotation
+** AVL Insertion
+*** 1. Normal leaf insertion (recursively)
+*** 2. At each step, insertino returns whether the height of the subtree inccreased
+*** 3. Insertion can only increase height or keep the same
+*** 4. "Report back" by going back up the tree, readjusting the balance factor
+* Implementation and Real-World Application
+** We don't necessarily have to have comparable data types in our AVL tree or any binary serach tree
+*** Use range queries
+**** Hashing of the keys so that it returns a number
+
+#+begin_src python
+
+def build_tree_increasing(n, result):
+    for i in range(n):
+        result.put(i,i)
+        return result
+#+end_src
+* Relational Tables (AKA Relational Databases) (03/01/2023)
+** Reminders
+*** CS_214 Project Late Turn in due _tonight_
+*** CS_214 Midterm 2 is _next Thursday, 03/09/23
+*** CS_214 Project Due Date #2 is next Tuesday, 03/07/23
+*** CS_214 Project Due Date #3 is the following Tuesday, 03/14/23
+** Creating an abstract data type that can be generalized across many different fields and disciplines
+** Why are we talking about generalized tables?
+*** Critical for most applications
+**** Literally any business application
+**** Chunk of data science
+**** Scientific data mangement
+**** Public sector data
+**** ELectronic medical records
+**** etc.
+*** They can literally be found ~anywhere~
+**** High on the list of "everything CS graduate shoudl know about (or at least have heard of)"
+**** Note: CS_339 is all about databases
+***** Each topic touched on here will just be a lecture in 339
+*** RElational Table ADT
+**** Closests to a universal ADt
+**** Abstract values: tables composed of an ubmer of row,s each with the same number of (the same) columns
+**** Two-dimensional
+***** Literally any .csv file or any .xml file
+| Name  | Position | Date of Birth |
+|-------+----------+---------------|
+| Betty | 1        | 1994-10-03    |
+| ...   | ...      | ...           |
+| ...   | ...      | ...           |
+| ...   | ...      | ...           |
+| ...   | ...      | ...           |
+
+**** Transformations, Filtering, Selection, etc.
+
+**** Relational Table Abstract Operations
+***** Power: Flexibility and Expressivity
+****** Operations are derived from _algebra_
+****** Expressed using SQL (pronounded sequel or S-Q-L)
+***** The competitors:
+****** Dictionaries
+******* Get the value for a given key. That's it
+******** Relational Tables don't have keys: an query basd on any part of the data, using any predicate
+******* Allow for a single value per key (the value can be a sequence)
+******** Relational queries can involve multiple rows: return directly, aggregate, sort, group, etc.
+******* Atomic
+******** Releational tables/queries can operate on different _parts_ of a row's data
+***** Essentials:
+****** Accessing data from alld directiosn
+******* Bidrectional mappings on steroids
+****** Allow for manipulation in many different ways
+******* Enumerate, aggregate, summarize, order, etc.
+****** Flexibility
+******* Wnat a new change? Data doesn't have to change
+******* Contrast: Requirements change for different metro areas
+****   Relational Algebra (for dummies)
+***** Mathematical formal ssytem for working with relational tables
+****** Projection:
+******* Performs an operation on a single row
+#+begin_latex
+\Pi_a_1, ..., Pi_a_1
+#+end_latex
+****** Selection:
+******* Keeps a subset of the rows discards the rest
+****** Composition:
+******* Using the query of a single operation as the variable for another operation
+****** Set Operations:
+******* Operations dervied through _set theory_
+******** Union
+******** Divide
+******** etc...
+********
+****** Aggregate Operations:
+******* Performing operations on entire columns
+******** Sorting, summing, grouping, etc.
+****
+********
+**** What does "relational" mean?
+***** Thinking of tables as _mathematical tables_
+****** Bidirectional analogue to functions
+****** No input/output distinction
+****** Can be expressed as sets of tuples
+******* Pairs, triples, etc.
+| Test1 | Test2 | Test3 |
+|-------+-------+-------|
+| ...   | ...   | ...   |
+| ...   | ...   | ...   |
+|       |       |       |
+
+******* {(x_1,y_1,z_2), (x_2,y_2,z_2), (x_3,y_3,z_3)}
+** Relations Across Multiple Tables (Section 2)
+*** Notice how we can have inconsistencies in these tables (breaking the invariant), since there is no fixed rules
+*** Avoiding confusion: Normalization
+**** Splitting data across numerous tables to eliminate redundancy
+***** ...thus eliminating possible inconsistencies
+***** adding a column that "connects" the two datasets, perhaps an "ID" that allows us to dinstinguish between potentially similar data entires is important
+**** Primary Keys
+***** Example: NetID at NU
+***** The concept of introducing a unique identifier that will be the primary method of reference to an entity.
+
+**** Foreign Keys
+***** The usage of keys across different datasets/dataframes to refer to the same entity
+****** Requires the usage of consluting two different tables and then using the join() function ⋈.
+******* Cartesian product
+****** Beware: Using foreign keys for different types can become redundant, thereby denormalizing the database
+** Programming with Databases
+*** SQL (Structured Query Language)
+**** "the canonical way to write relational algebra as programs"
+***** Specialized language
+****** Not a Turing programming language
+******* Declarative language ("what" not "how")
+******* (Almost) never the full application, but context matters
+****** Around since the 70s, standardized in 1986
+******* Standardized (different implementations, but has similar behavior)
+******** Does possess some caveats
+
+**** SQL Verbs (Commands/Functions)
+***** select (cols) from (tables) where (preds); etc.
+***** Other manipulations
+****** insert()
+****** delete()
+****** update()
+
+** Relational Database Management System (RDBMS)
+*** PostgreSQL, Oracle, MySQL, MS SQL Server, etc.
+**** The ssytem works like this, a computer sends a query to the database server, which then performs the oeprations then sends the output back
+**** Connecting different applications connect to a single Database
+***** NU Caesar, Canvas, myHR, etc.
+*** Often performance-critical componenets of systems
+**** Typically quite complex
+***** Requires lots of smarts in implementatino
+**** "Greatest Hits" of Computer Science
+***** Borrows from every single facet of CS
+**** Ecxtremely "deep"
